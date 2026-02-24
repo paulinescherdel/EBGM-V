@@ -1,4 +1,4 @@
-This code repository is associated with the publication "Development, internal and external evaluation of an artificial intelligence algorithm for child growth monitoring". 
+This code repository is associated with the publication "Development, internal and external evaluation of an artificial intelligence algorithm for child growth monitoring in primary care". 
 
 We provide the codes : 
 - to model individual height trajectories using the Jenss-Bayley non-linear mixed model according to sex, 
@@ -7,7 +7,7 @@ We provide the codes :
 Fictive samples of the dataset are included in this repository as sample_G.rda (for boys) and sample_F (for girls). 
 The full datasets are not publicly released due to privacy and licensing constraints. 
 
-These samples include as variables: 
+These samples include: 
 - id
 - sex (1=boy, 2=girl)
 - age (in days)
