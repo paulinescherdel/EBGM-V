@@ -22,6 +22,7 @@ library(caret)
 library(dplyr)
 library(pROC)
 library(gd)
+library(performance)
 
 path="our path" 
 
@@ -61,13 +62,22 @@ traindata_8_12 <- selection(traindata,2920,4381)
 
 # multicollinearity diagnostics
 # ------------------------------
+  ## Pairwise correlation
 cor1_12 <- ggcorrplot(cor(traindata_1_2[c("A","B", "C", "D")], method="spearman"),       type = "upper", show.diag = T, title = "", legend.title = "", lab=T, colors = c("darkred", "white", "black"), tl.srt = 0)
 cor1_2 <- ggcorrplot(cor(traindata_1_2[c("A","B", "C", "D")], method="spearman"),       type = "upper", show.diag = T, title = "", legend.title = "", lab=T, colors = c("darkred", "white", "black"), tl.srt = 0)
 cor2_3 <- ggcorrplot(cor(traindata_2_3[c("A","B", "C", "D")], method="spearman"),       type = "upper", show.diag = T, title = "", legend.title = "", lab=T, colors = c("darkred", "white", "black"), tl.srt = 0)
 cor3_5 <- ggcorrplot(cor(traindata_3_5[c("A","B", "C", "D")], method="spearman"),       type = "upper", show.diag = T, title = "", legend.title = "", lab=T, colors = c("darkred", "white", "black"), tl.srt = 0)
 cor5_8 <- ggcorrplot(cor(traindata_5_8[c("A","B", "C", "D")], method="spearman"),       type = "upper", show.diag = T, title = "", legend.title = "", lab=T, colors = c("darkred", "white", "black"), tl.srt = 0)
 cor8_12<- ggcorrplot(cor(traindata_8_12[c("A","B", "C", "D", "E")], method="spearman"), type = "upper", show.diag = T, title = "", legend.title = "", lab=T, colors = c("darkred", "white", "black"), tl.srt = 0)
-  
+
+  ## VIF and tolerance    
+check_collinearity(lm(x~A+B+C+D+sexe,   data = traindata_1_2))
+check_collinearity(lm(x~A+B+C+D+sexe,   data = traindata_2_3))
+check_collinearity(lm(x~A+B+C+D+sexe,   data = traindata_3_5))
+check_collinearity(lm(x~A+B+C+D+sexe,   data = traindata_5_8))
+check_collinearity(lm(x~A+B+C+D+E+sexe, data = traindata_8_12))
+
+
 # Predictive models
 # -----------------
 ##### Multinomial logistic regression 
@@ -247,6 +257,7 @@ prediction(algorithme_training=fit.rlm.mf.2_3, newdata=valdata, thres=s98_rlm.mf
 prediction(algorithme_training=fit.rlm.mf.3_5, newdata=valdata, thres=s98_rlm.mf_3_5[[1]])
 prediction(algorithme_training=fit.rlm.mf.5_8, newdata=valdata, thres=s98_rlm.mf_5_8[[1]])
 prediction(algorithme_training=fit.rlm.mf.8_12,newdata=valdata, thres=s98_rlm.mf_8_12[[1]])
+
 
 
 
