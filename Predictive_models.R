@@ -63,19 +63,67 @@ traindata_8_12 <- selection(traindata,2920,4381)
 # multicollinearity diagnostics
 # ------------------------------
   ## Pairwise correlation
-cor1_12 <- ggcorrplot(cor(traindata_1_2[c("A","B", "C", "D")], method="spearman"),       type = "upper", show.diag = T, title = "", legend.title = "", lab=T, colors = c("darkred", "white", "black"), tl.srt = 0)
-cor1_2 <- ggcorrplot(cor(traindata_1_2[c("A","B", "C", "D")], method="spearman"),       type = "upper", show.diag = T, title = "", legend.title = "", lab=T, colors = c("darkred", "white", "black"), tl.srt = 0)
-cor2_3 <- ggcorrplot(cor(traindata_2_3[c("A","B", "C", "D")], method="spearman"),       type = "upper", show.diag = T, title = "", legend.title = "", lab=T, colors = c("darkred", "white", "black"), tl.srt = 0)
-cor3_5 <- ggcorrplot(cor(traindata_3_5[c("A","B", "C", "D")], method="spearman"),       type = "upper", show.diag = T, title = "", legend.title = "", lab=T, colors = c("darkred", "white", "black"), tl.srt = 0)
-cor5_8 <- ggcorrplot(cor(traindata_5_8[c("A","B", "C", "D")], method="spearman"),       type = "upper", show.diag = T, title = "", legend.title = "", lab=T, colors = c("darkred", "white", "black"), tl.srt = 0)
-cor8_12<- ggcorrplot(cor(traindata_8_12[c("A","B", "C", "D", "E")], method="spearman"), type = "upper", show.diag = T, title = "", legend.title = "", lab=T, colors = c("darkred", "white", "black"), tl.srt = 0)
+  cor1_12 <- ggcorrplot(cor(traindata_1_2[c("A","B", "C", "D")], method="spearman"),       type = "upper", show.diag = T, title = "", legend.title = "", lab=T, colors = c("darkred", "white", "black"), tl.srt = 0)
+  cor1_2 <- ggcorrplot(cor(traindata_1_2[c("A","B", "C", "D")], method="spearman"),       type = "upper", show.diag = T, title = "", legend.title = "", lab=T, colors = c("darkred", "white", "black"), tl.srt = 0)
+  cor2_3 <- ggcorrplot(cor(traindata_2_3[c("A","B", "C", "D")], method="spearman"),       type = "upper", show.diag = T, title = "", legend.title = "", lab=T, colors = c("darkred", "white", "black"), tl.srt = 0)
+  cor3_5 <- ggcorrplot(cor(traindata_3_5[c("A","B", "C", "D")], method="spearman"),       type = "upper", show.diag = T, title = "", legend.title = "", lab=T, colors = c("darkred", "white", "black"), tl.srt = 0)
+  cor5_8 <- ggcorrplot(cor(traindata_5_8[c("A","B", "C", "D")], method="spearman"),       type = "upper", show.diag = T, title = "", legend.title = "", lab=T, colors = c("darkred", "white", "black"), tl.srt = 0)
+  cor8_12<- ggcorrplot(cor(traindata_8_12[c("A","B", "C", "D", "E")], method="spearman"), type = "upper", show.diag = T, title = "", legend.title = "", lab=T, colors = c("darkred", "white", "black"), tl.srt = 0)
 
-  ## VIF and tolerance    
-check_collinearity(lm(x~A+B+C+D+sexe,   data = traindata_1_2))
-check_collinearity(lm(x~A+B+C+D+sexe,   data = traindata_2_3))
-check_collinearity(lm(x~A+B+C+D+sexe,   data = traindata_3_5))
-check_collinearity(lm(x~A+B+C+D+sexe,   data = traindata_5_8))
-check_collinearity(lm(x~A+B+C+D+E+sexe, data = traindata_8_12))
+  ## VIF and tolerance
+  multicoll <- function(training_data, p1,p2,p3,p4, p5,p6){
+      if (is.null(p6)==T){
+        m1=lm(p1~p2+p3+p4+p5,    data = training_data); v1=  1/(1 - summary(m1)$r.squared);t1=1 - summary(m1)$r.squared
+        m2=lm(p2~p1+p3+p4+p5,    data = training_data); v2=  1/(1 - summary(m2)$r.squared);t2=1 - summary(m2)$r.squared
+        m3=lm(p3~p1+p2+p4+p5,    data = training_data); v3=  1/(1 - summary(m3)$r.squared);t3=1 - summary(m3)$r.squared
+        m4=lm(p4~p1+p2+p3+p5,    data = training_data); v4=  1/(1 - summary(m4)$r.squared);t4=1 - summary(m4)$r.squared
+        m5=lm(p5~p1+p2+p3+p4,    data = training_data); v5=  1/(1 - summary(m5)$r.squared);t5=1 - summary(m5)$r.squared
+      
+        resu <- cbind.data.frame(c("A","B","C","D","sexe"),rbind.data.frame(v1,v2,v3,v4,v5),rbind.data.frame(t1,t2,t3,t4,t5)); colnames(resu)<- c("Growth.parameters", "VIF", "Tolerance")
+       
+        g=ggplot() +
+          geom_point(data = resu, aes(x = Growth.parameters, y = VIF),shape=21, fill="black")+
+          geom_rect(aes(xmin = -Inf, xmax = Inf, ymin = 0, ymax = 5),   fill = "green",  alpha = 0.2) +
+          geom_rect(aes(xmin = -Inf, xmax = Inf, ymin = 5, ymax = 10),  fill = "orange", alpha = 0.2) +
+          geom_rect(aes(xmin = -Inf, xmax = Inf, ymin = 10, ymax = 12), fill = "red",    alpha = 0.2) +
+          scale_x_discrete("")+
+          scale_y_continuous("VIF", limits=c(0,12), breaks = seq(0,12,2))+
+          theme_minimal()
+        
+      return(list(resu,g))
+      }
+      if (is.null(p6)==F){ 
+       m1=lm(p1~p2+p3+p4+p5+p6, data = training_data);v1=  1/(1 - summary(m1)$r.squared);t1=1 - summary(m1)$r.squared
+       m2=lm(p2~p1+p3+p4+p5+p6, data = training_data);v2=  1/(1 - summary(m2)$r.squared);t2=1 - summary(m2)$r.squared
+       m3=lm(p3~p1+p2+p4+p5+p6, data = training_data);v3=  1/(1 - summary(m3)$r.squared);t3=1 - summary(m3)$r.squared
+       m4=lm(p4~p1+p2+p3+p5+p6, data = training_data);v4=  1/(1 - summary(m4)$r.squared);t4=1 - summary(m4)$r.squared
+       m5=lm(p5~p1+p2+p3+p4+p6, data = training_data);v5=  1/(1 - summary(m5)$r.squared);t5=1 - summary(m5)$r.squared
+       m6=lm(p6~p1+p2+p3+p4+p5, data = training_data);v6=  1/(1 - summary(m6)$r.squared);t6=1 - summary(m6)$r.squared
+       
+       resu <- cbind.data.frame(c("A","B","C","D","E","sexe"),rbind.data.frame(v1,v2,v3,v4,v5,v6),rbind.data.frame(t1,t2,t3,t4,t5,t6)); colnames(resu)<- c("Growth.parameters", "VIF", "Tolerance")
+      
+       
+       g=ggplot() +
+         geom_point(data = resu, aes(x = Growth.parameters, y = VIF),shape=21, fill="black")+
+         geom_rect(aes(xmin = -Inf, xmax = Inf, ymin = 0, ymax = 5),   fill = "green",  alpha = 0.2) +
+         geom_rect(aes(xmin = -Inf, xmax = Inf, ymin = 5, ymax = 10),  fill = "orange", alpha = 0.2) +
+         geom_rect(aes(xmin = -Inf, xmax = Inf, ymin = 10, ymax = 12), fill = "red",    alpha = 0.2) +
+         scale_x_discrete("")+
+         scale_y_continuous("VIF", limits=c(0,12), breaks = seq(0,12,2))+
+         theme_minimal()
+        
+       return(list(resu,g))
+       }
+      
+
+    }
+    vif1_12<- multicoll(traindata_1_12,traindata_1_12$A,traindata_1_12$B,traindata_1_12$C,traindata_1_12$D,traindata_1_12$E,traindata_1_12$sexe)
+    vif1_2  <- multicoll(traindata_1_2,traindata_1_2$A,traindata_1_2$B,traindata_1_2$C,traindata_1_2$D,traindata_1_2$sexe,NULL)
+    vif2_3  <- multicoll(traindata_2_3,traindata_2_3$A,traindata_2_3$B,traindata_2_3$C,traindata_2_3$D,traindata_2_3$sexe,NULL)
+    vif3_5  <- multicoll(traindata_3_5,traindata_3_5$A,traindata_3_5$B,traindata_3_5$C,traindata_3_5$D,traindata_3_5$sexe,NULL)
+    vif5_8  <- multicoll(traindata_5_8,traindata_5_8$A,traindata_5_8$B,traindata_5_8$C,traindata_5_8$D,traindata_5_8$sexe,NULL)
+    vif8_12 <- multicoll(traindata_8_12,traindata_8_12$A,traindata_8_12$B,traindata_8_12$C,traindata_8_12$D,traindata_8_12$E,traindata_8_12$sexe)
+  
 
 
 # Predictive models
@@ -257,6 +305,7 @@ prediction(algorithme_training=fit.rlm.mf.2_3, newdata=valdata, thres=s98_rlm.mf
 prediction(algorithme_training=fit.rlm.mf.3_5, newdata=valdata, thres=s98_rlm.mf_3_5[[1]])
 prediction(algorithme_training=fit.rlm.mf.5_8, newdata=valdata, thres=s98_rlm.mf_5_8[[1]])
 prediction(algorithme_training=fit.rlm.mf.8_12,newdata=valdata, thres=s98_rlm.mf_8_12[[1]])
+
 
 
 
