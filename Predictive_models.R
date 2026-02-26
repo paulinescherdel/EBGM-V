@@ -142,7 +142,6 @@ traindata_8_12 <- selection(traindata,2920,4381)
   vif8_12 <- multicoll(traindata_8_12,traindata_8_12$A,traindata_8_12$B,traindata_8_12$C,traindata_8_12$D,traindata_8_12$E,traindata_8_12$sexe)
     
 
-
 # Predictive models
 # -----------------
 ##### Multinomial logistic regression 
@@ -322,6 +321,7 @@ prediction(algorithme_training=fit.rlm.mf.2_3, newdata=valdata, thres=s98_rlm.mf
 prediction(algorithme_training=fit.rlm.mf.3_5, newdata=valdata, thres=s98_rlm.mf_3_5[[1]])
 prediction(algorithme_training=fit.rlm.mf.5_8, newdata=valdata, thres=s98_rlm.mf_5_8[[1]])
 prediction(algorithme_training=fit.rlm.mf.8_12,newdata=valdata, thres=s98_rlm.mf_8_12[[1]])
+
 
 
 
